@@ -1,19 +1,18 @@
-// See https://github.com/typicode/json-server#module
-const jsonServer = require('json-server')
-const server = jsonServer.create()
-const router = jsonServer.router('db.json')
-const middlewares = jsonServer.defaults()
+const jsonServer = require('json-server');
+const server = jsonServer.create();
+const router = jsonServer.router('db.json');
+const middlewares = jsonServer.defaults();
 
-server.use(middlewares)
-// Add this before server.use(router)
-server.use(jsonServer.rewriter({
-    '/api/*': '/$1',
-    '/blog/:resource/:id/show': '/:resource/:id'
-}))
-server.use(router)
-server.listen(3000, () => {
-    console.log('JSON Server is running')
-})
+server.use(middlewares);
 
-// Export the Server API
-module.exports = server
+// Adicione um middleware para redirecionar todas as solicitações para o JSON Server
+server.use((req, res, next) => {
+  // Certifique-se de redirecionar todas as solicitações, independentemente do método HTTP
+  router(req, res, next);
+});
+
+// Implementação do servidor HTTP para funções serverless do Vercel
+module.exports = (req, res) => {
+  // Chame o servidor JSON diretamente
+  server(req, res);
+};
